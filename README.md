@@ -11,3 +11,13 @@ $$
 $$
 
 For the video itself, the frame rate of the video is around **35.14 Hz** around the entire 3 min video (180 seconds)
+
+### Cloning purpose
+
+For working and cloning with this, make an environment with conda and run this
+
+```shell
+conda env create -f environment.yml
+
+conda activate codex_astartes
+```
