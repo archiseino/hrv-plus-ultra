@@ -29,4 +29,6 @@ Working on Reserach Later I guess
 
 ### Notes:
 
-Setup the clustering on the face using mediapipe face detection
+- Setup the clustering on the face using mediapipe face detection
+- Well, reference article it seems using Sentiment Analysis as the backup for the HRV.
+- Do some Signal Frequency quality indicator with `signal.welch`
