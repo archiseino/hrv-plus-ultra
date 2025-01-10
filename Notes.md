@@ -32,3 +32,7 @@ Working on Reserach Later I guess
 - Setup the clustering on the face using mediapipe face detection
 - Well, reference article it seems using Sentiment Analysis as the backup for the HRV.
 - Do some Signal Frequency quality indicator with `signal.welch`
+- Change the ROI around the under the eye
+  - One should use the left under the eye as the ROI
+  - and one should use both under the eye area as the ROI
+- The concept of Facelandmarking can be working really well for detecting the area compare to faceDetector
