@@ -36,3 +36,4 @@ Working on Reserach Later I guess
   - One should use the left under the eye as the ROI
   - and one should use both under the eye area as the ROI
 - The concept of Facelandmarking can be working really well for detecting the area compare to faceDetector
+- Notes: Using improved conditional ROI and adaptive filtering it seems still produce the same result. I guess this is fine, and we can procceed to the next phase: Feature Extracting
