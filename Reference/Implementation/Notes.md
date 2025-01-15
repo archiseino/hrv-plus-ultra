@@ -1,0 +1,1 @@
+This section is more or less same with Overview, the article just focus on the implemenation rather to the details, I can assume the same thing for the HRV Feature Extraction with the Overview section. Also emotion in this part are based on the sentiment analysis and not a real time, well.
