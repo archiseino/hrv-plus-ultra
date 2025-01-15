@@ -37,3 +37,9 @@ Working on Reserach Later I guess
   - and one should use both under the eye area as the ROI
 - The concept of Facelandmarking can be working really well for detecting the area compare to faceDetector
 - Notes: Using improved conditional ROI and adaptive filtering it seems still produce the same result. I guess this is fine, and we can procceed to the next phase: Feature Extracting
+- Well, We found some problem, the requirement as minimum to run the Freq analysis on HRV requires the samples to take on 2 minute length / 4000-ish data.
+
+## Ref
+
+In many natural processes, data collection is often unevenly spaced due to real-world constraints, such as unpredictable events, equipment limitations, or missing measurements. This is why techniques like the Lomb-Scargle periodogram were developed—to handle these irregularities in sampling effectively.
+  
