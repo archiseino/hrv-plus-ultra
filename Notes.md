@@ -40,6 +40,11 @@ Working on Reserach Later I guess
 - Well, We found some problem, the requirement as minimum to run the Freq analysis on HRV requires the samples to take on 2 minute length / 4000-ish data.
 - Hmm, alternate ways of using Baevsky Stress Index? But the window lengths still the challenge
 - It seems doing interpolation doesn't do much things, time still matter
+- I guess we can still do the 2 minute analysis with the signal, we can try 3 classes prediction later based on the HRV value,
+
+### Temporal Solution
+
+One solution for this is to make the analysis is combination of the HR, Face Expression value (optional), HRV value, with 35 Hz as the sampling rate.
 
 ## Ref
 
