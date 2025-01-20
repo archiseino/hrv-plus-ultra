@@ -49,3 +49,9 @@ One solution for this is to make the analysis is combination of the HR, Face Exp
 ## Ref
 
 In many natural processes, data collection is often unevenly spaced due to real-world constraints, such as unpredictable events, equipment limitations, or missing measurements. This is why techniques like the Lomb-Scargle periodogram were developed—to handle these irregularities in sampling effectively.
+
+## Update
+
+Well, Waiting for 2 minute is a pain. Ah I see I wonder we can talk about the scope later with Mr. Martin
+
+![image](assets/image.png)
