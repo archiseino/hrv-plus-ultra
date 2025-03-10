@@ -183,7 +183,7 @@ class HRVMonitoring(QWidget):
                     ## Reset the RGB Signal
                     self.baevsky_r_signal, self.baevsky_g_signal, self.baevsky_b_signal = [], [], []
 
-                                        # Preprocess the PPG signal
+                    # Preprocess the PPG signal
                     ppg_signal = preprocess_ppg(self.baevsky_rppg_signal, fs=35)
 
                     ## Clean the RR Interval
