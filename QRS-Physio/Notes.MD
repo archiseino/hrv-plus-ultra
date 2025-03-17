@@ -1,0 +1,36 @@
+## HRV Using Physio Itera Dataset
+
+Dataset performed by Mr. Martin using ITERA subject.
+
+Procedure of doing recording is the subject doing the exercise first and then the recording is do after Post Exercise, as described in this Scenario.
+
+#### Trivial
+
+Why don't also record when doing exercise?
+
+## Capture Scenario
+
+| **Scenario** | **Description**                                   |
+| :----------- | :------------------------------------------------ |
+| 1            | Sit down with mask, post exercise                 |
+| 2            | Sit down without mask, post exercise              |
+| 3            | Sleeping position with face towards the camera    |
+| 4            | Sleeping position without face towards the camera |
+| 5            | Sit down with mask, relax                         |
+| 6            | Sit down without mask, relax                      |
+
+## Sampling Rate
+
+- For video, it takes sampling rate 30 fps (1800 Images) / 60 Detik
+- For GT ECG 200 Hz (12000 Value) / 60 Detik
+
+## Notes
+
+- For the way we doing, it it seems the procedure for the MMPD and Physio Itera are the same.
+- Using Even Samples (2, 6) since the face is visible and we can observe the signal after exercise and resting.
+
+### Irregularity between ECG and PPG
+
+- It seems ECG can maintain the shape of the signal compare to PPG, but I can see it why, since ECG is comes from electricity signals from Heart, and PPG can have delays and artifacts, so one should note the PPG and ECG signal will be differ. Especially ECG will have strong regularity pattern and PPG will probably not.
+- Hitam question, black people have hard time doing this haha
+- But as long the estimation of HR are fine, I think it also fine.
