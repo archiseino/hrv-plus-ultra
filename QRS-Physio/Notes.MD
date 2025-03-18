@@ -29,6 +29,12 @@ Why don't also record when doing exercise?
 - For the way we doing, it it seems the procedure for the MMPD and Physio Itera are the same.
 - Using Even Samples (2, 6) since the face is visible and we can observe the signal after exercise and resting.
 
+- Ganti Mode, it seems using facial landmark doesn't detect the frame sometimes (For female subject, it seems based on the Mukena stuff)
+
+- For facial detection, it seem the RGB signal are looking weird, but still produce the overall good RGB value,
+- Try to limit / reduce the ROI / Bounding box of the face, the bounding box are to large at this point.
+- The homework try to look up the factor to reduce the ROI
+
 ### Irregularity between ECG and PPG
 
 - It seems ECG can maintain the shape of the signal compare to PPG, but I can see it why, since ECG is comes from electricity signals from Heart, and PPG can have delays and artifacts, so one should note the PPG and ECG signal will be differ. Especially ECG will have strong regularity pattern and PPG will probably not.
