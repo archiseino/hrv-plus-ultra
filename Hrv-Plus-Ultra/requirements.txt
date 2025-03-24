@@ -5,9 +5,8 @@ docutils==0.18.1
 fonttools==4.31.1
 idna==3.3
 Kivy==2.1.0
-Kivy-Garden==0.1.4
 kiwisolver==1.4.0
-matplotlib==3.5.1
+matplotlib==3.10.0
 numpy==1.26.0
 packaging==21.3
 Pillow==9.0.1
@@ -16,6 +15,6 @@ Pygments==2.11.2
 pyparsing==3.0.7
 python-dateutil==2.8.2
 requests==2.27.1
-scipy==1.8.0
+scipy==1.15.2
 six==1.16.0
 urllib3==1.26.9

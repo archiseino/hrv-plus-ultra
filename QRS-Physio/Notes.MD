@@ -35,8 +35,14 @@ Why don't also record when doing exercise?
 - Try to limit / reduce the ROI / Bounding box of the face, the bounding box are to large at this point.
 - The homework try to look up the factor to reduce the ROI
 
+- Does the area roi is not fit perfectly fine? Or should I use the segmentation, but it will increase the process time.
+
 ### Irregularity between ECG and PPG
 
 - It seems ECG can maintain the shape of the signal compare to PPG, but I can see it why, since ECG is comes from electricity signals from Heart, and PPG can have delays and artifacts, so one should note the PPG and ECG signal will be differ. Especially ECG will have strong regularity pattern and PPG will probably not.
 - Hitam question, black people have hard time doing this haha
 - But as long the estimation of HR are fine, I think it also fine.
+
+## Dataset Outlier
+
+Model Alina 2 / 6 can't be capture with mediapipe, one thought is that the glasses reflect light

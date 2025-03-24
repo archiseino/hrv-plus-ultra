@@ -17,8 +17,6 @@ Builder.load_string("""
         color: 0, 1, 0, 1
 
 <ProgressBarWidget>:
-    size_hint: None, None
-    size: 200, 30
 
 """)
 

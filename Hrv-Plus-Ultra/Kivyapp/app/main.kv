@@ -3,6 +3,7 @@
 #:import IconButton widgets.buttons.IconButton
 #:import OverlayContainer widgets.containers.OverlayContainer
 #:import StatusBox widgets.containers.StatusBox
+#:import ProgressBarWidget widgets.utils.ProgressBarWidget
 
 # Home Monitoring Section
 <StressMonitorLayout>:
@@ -17,10 +18,9 @@
 
     ## Container for Camera and Graph
     BoxLayout:
-        padding: dp(6)
         orientation: 'vertical'
         Text:
-            size_hint_y: 0.08
+            size_hint_y: 0.05
             text: "v0.1 - Jawa"
 
         BoxLayout:
@@ -93,7 +93,7 @@
                     orientation: "vertical" 
 
                     BoxLayout:
-                        size_hint_y: 0.1
+                        size_hint_y: 0.2
                         orientation: 'horizontal'
 
                         AnchorLayout:
@@ -169,7 +169,7 @@
                                 Text:
                                     text: "75 BPM"
                                     font_name: app.fonts.body
-                                    font_size: app.fonts.size.h2
+                                    font_size: app.fonts.size.h3
                                     color: app.colors.black
 
                             BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
@@ -208,7 +208,7 @@
                                 Text:
                                     text: "98%"
                                     font_name: app.fonts.body
-                                    font_size: app.fonts.size.h2
+                                    font_size: app.fonts.size.h3
                                     color: app.colors.black
 
                             BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
@@ -221,6 +221,10 @@
                                     font_size: app.fonts.size.h5
                                     color: app.colors.success
 
+                    BoxLayout:
+                        size_hint: 1, 0.4
+                        padding: dp(8)
+                        spacing: dp(8)
                         StatusBox:
                             size_hint: 1, 1
                             radius: [dp(16)] ## Rounded 16dp
@@ -247,7 +251,7 @@
                                 Text:
                                     text: "45 Ms"
                                     font_name: app.fonts.body
-                                    font_size: app.fonts.size.h2
+                                    font_size: app.fonts.size.h3
                                     color: app.colors.black
 
                             BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
@@ -260,10 +264,52 @@
                                     font_size: app.fonts.size.h5
                                     color: app.colors.success
                     
+                        StatusBox:
+                            size_hint: 1, 1
+                            radius: [dp(16)] ## Rounded 16dp
+                            orientation: 'vertical'
+                            BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
+                                spacing: dp(8)  
+                                padding: dp(8)
+                                size_hint_y: 1
+                                IconButton:
+                                    size_hint: None, None
+                                    size: dp(16), dp(16)
+                                    pos_hint: {'center_y': 0.5}
+                                    source: 'assets/icons/lungs-solid.png'
+                                Text:
+                                    text: "Resp Rate"
+                                    font_name: app.fonts.body
+                                    font_size: app.fonts.size.h5
+                                    color: app.colors.black
+
+                            BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
+                                spacing: dp(8)  
+                                padding: dp(8)
+                                size_hint_y: 1
+                                Text:
+                                    text: "15 BPM"
+                                    font_name: app.fonts.body
+                                    font_size: app.fonts.size.h3
+                                    color: app.colors.black
+
+                            BoxLayout:  # Wrap inside a horizontal BoxLayout to avoid overlap
+                                size_hint_y: 1
+                                spacing: dp(8)  
+                                padding: dp(8)
+                                Text:
+                                    text: "Normal"
+                                    font_name: app.fonts.body
+                                    font_size: app.fonts.size.h5
+                                    color: app.colors.success
+
+
                     BoxLayout:
-                        size_hint_y: 0.2
+                        size_hint_y: 0.15
+                        orientation: 'vertical'
                         Text:
                             text:"Jawa - Stress Indicator [Later]"
+                        ProgressBarWidget:
 
 <CameraLayout>:
     allow_stretch: True
