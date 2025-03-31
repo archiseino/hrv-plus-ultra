@@ -14,3 +14,5 @@ Let's assume for the sake of simplicity the Unos (butter simple filtering) and D
 Let's pick the Simplest Filtering one.
 
 What buffer should we keep 30 seconds? 1 Minute or else?
+
+offset 500 samples so around (30 fps \* 20 seconds)
