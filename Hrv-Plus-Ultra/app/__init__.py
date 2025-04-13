@@ -1,6 +1,8 @@
 from kivy.app import App
 from kivy.utils import QueryDict, rgba
 from kivy.metrics import dp
+import os
+import sys
 
 from .view import StressMonitorLayout
 
@@ -31,3 +33,11 @@ class MainApp(App):
 
     def build(self):
         return StressMonitorLayout()
+    
+    @staticmethod
+    def resource_path(relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)

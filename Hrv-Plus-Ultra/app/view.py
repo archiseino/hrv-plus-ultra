@@ -13,10 +13,18 @@ from mediapipe.tasks.python import vision
 ## Import Signal Processing
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import sys
 
 from utils.filtering import preprocess_ppg
 
-base_model="../Kivyapp/models/blaze_face_short_range.tflite"
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 class CameraLayout(Image):
     def __init__(self, **keyargs):
         super().__init__(**keyargs) ## KV Files config
@@ -26,16 +34,45 @@ class CameraLayout(Image):
         self.capture = cv2.VideoCapture(0)  ## Start the Camera
         Clock.schedule_interval(self.update, 1.0 / 30) ## Update the Camera feed at 30 FPS
         Clock.schedule_interval(self.emit_rppg_signal, 1.0/ 10) ## Emit the signal at 10 Hz
+
+
+        ## Set schedule for Phys signal
+        Clock.schedule_interval(self.update_heart_rate, 2)      # every 2s
+        Clock.schedule_interval(self.update_hrv, 30)            # every 30s
+        Clock.schedule_interval(self.update_resp, 15)           # every 15s
+        Clock.schedule_interval(self.update_spo2, 30)           # every 30s
+
         self.combined_r_signal = []
         self.combined_g_signal = []
         self.combined_b_signal = []
         self.rppg_buffer = []
         self.emitting_rppg_buffer = []
 
+    def update_heart_rate(self, dt):
+        if len(self.rppg_buffer) > 0:
+            app = App.get_running_app()
+            app.root.ids.hr_box.update_value(np.array(self.emitting_rppg_buffer))
+
+    def update_hrv(self, dt):
+        if len(self.rppg_buffer) > 0:
+            app = App.get_running_app()
+            app.root.ids.hrv_box.update_value(np.array(self.emitting_rppg_buffer))
+
+    def update_resp(self, dt):
+        if len(self.rppg_buffer) > 0:
+            app = App.get_running_app()
+            app.root.ids.resp_box.update_value(np.array(self.emitting_rppg_buffer))
+
+    def update_spo2(self, dt):
+        if len(self.rppg_buffer) > 0:
+            app = App.get_running_app()
+            app.root.ids.spo2_box.update_value(np.array(self.emitting_rppg_buffer))
+
     def setup_face_landmarker(self):
         ## Create faceDetector Object
+        base_model=resource_path("models/blaze_face_short_range.tflite")
+
         base_options = python.BaseOptions(model_asset_path=base_model)
-        FaceDetector = mp.tasks.vision.FaceDetector
         FaceDetectorOptions = mp.tasks.vision.FaceDetectorOptions
         VisionRunningMode = mp.tasks.vision.RunningMode
         options = FaceDetectorOptions(
@@ -93,6 +130,7 @@ class CameraLayout(Image):
             self.signal_value = self.emitting_rppg_buffer.pop(0) # Emit the rPPG signal
             app.root.update_stress_signal(self.signal_value)
 
+
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
@@ -132,7 +170,7 @@ class CameraLayout(Image):
 
         rppg_signal = preprocess_ppg(rppg_signal, fs=self.fps) ## Preprocess the rPPG signal
 
-        self.rppg_buffer.append(rppg_signal)  ## Store the rPPG signalq
+        self.rppg_buffer.append(rppg_signal)  ## Store the rPPG signal
 
         self.emitting_rppg_buffer.extend(rppg_signal)  ## Emit the rPPG signal
 
@@ -170,26 +208,12 @@ class StressMonitorLayout(BoxLayout):
             self.time_values.pop(0)
 
     def update_graph(self, dt):
-        # if self.line_index < 5:
-        #     x = [j for j in range(5)]
-        #     y = [j * (self.line_index + 1) for j in range(5)]
-        #     line, = self.ax1.plot(x, y, label=f'line{self.line_index + 1}')
-        #     self.lines.append(line)
-        #     self.figure_wgt.register_lines(self.lines)
-        #     self.line_index += 1
-        #     self.figure_wgt.figure.canvas.draw_idle()  # Refresh the figure 
 
         if len(self.signal_values) > 1:
             line = self.ax1.plot(self.time_values, self.signal_values, color='b', label='rPPG Signal')
             self.lines.append(line)
             self.figure_wgt.register_lines(self.lines)
             self.figure_wgt.figure.canvas.draw_idle()  # Refresh the figure            
-            # self.line.set_xdata(self.time_values)
-            # self.line.set_ydata(self.signal_values)
-            # self.ax1.set_xlim(max(0, self.time_index - 100), self.time_index)  # Keep moving window
-            # self.ax1.set_ylim(min(self.signal_values) - 5, max(self.signal_values) + 5)  # Auto-scale
-
-            # self.figure_wgt.figure.canvas.draw_idle()  # Refresh the figure
 
 ## Core method POS 
 def POS(signal, **kargs):

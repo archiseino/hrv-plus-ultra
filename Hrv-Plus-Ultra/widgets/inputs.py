@@ -12,7 +12,6 @@ Builder.load_string("""
     shorten_from: "right"
     shorten: True
     color: [0,0,0, 1]
-    markup: True
                     
 <CustomTextInput>:
     size_hint: None, None
