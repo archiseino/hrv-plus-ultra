@@ -5,7 +5,6 @@ import os
 import sys
 
 from .view import StressMonitorLayout
-
 class MainApp(App):
     colors = QueryDict()
     colors.primary = rgba("#2D9CDB")

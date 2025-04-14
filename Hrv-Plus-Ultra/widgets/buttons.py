@@ -2,8 +2,7 @@ from kivy.lang import Builder
 from kivy.uix.button import Button
 
 ## Import Properties for Button Attribute
-from kivy.properties import ColorProperty, ListProperty, StringProperty
-from kivy.graphics import RoundedRectangle, Color
+from kivy.properties import StringProperty
 from kivy.metrics import dp
 
 Builder.load_string("""
@@ -25,22 +24,6 @@ Builder.load_string("""
             size: self.size
             source: self.source
                     
-<CustomButton>:
-    size_hint: None, None
-    size: 150, 50
-    canvas.before:
-        Color:
-            rgba: 1, 1, 1, 1
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [20,]
-    background_color: 0.2, 0.6, 1, 1
-    font_size: '16sp'
-    background_normal: ''
-    background_down: ''
-    on_press: root.on_click()
-
 """)
 
 class FlatButton(Button):
@@ -58,11 +41,5 @@ class IconButton(FlatButton):
         super().__init__(**kw)
 
     def on_click(self):
-        print("Jawa")
-
-class CustomButton(FlatButton):
-    def __init__(self, text="Jawa", **kwargs):
-        super().__init__(text=text, **kwargs)
-    
-    def on_click(self):
-        print(f"{self.text} button clicked!")
+        """ Add your click action here  """
+        print("IconButton clicked")

@@ -1,11 +1,22 @@
 #:import ShadowBox widgets.containers.ShadowBox
 #:import Text widgets.inputs.Text
 #:import IconButton widgets.buttons.IconButton
-#:import OverlayContainer widgets.containers.OverlayContainer
-#:import StatusBox widgets.containers.StatusBox
 #:import ProgressBarWidget widgets.utils.ProgressBarWidget
+#:import CameraLayout widgets.camera.CameraLayout
 
-# Home Monitoring Section
+#:import HrBox widgets.phys-box.hr.HrBox
+#:import HrvBox widgets.phys-box.hrv.HrvBox
+#:import SpO2Box widgets.phys-box.spo2.SpO2Box
+#:import RespBox widgets.phys-box.resp.RespBox
+
+
+# Don't touch this, proceed with cautions
+# This layout UI is based on the assets/images/UI.jpg
+
+# The kv files is based on Declarative UI paradigm, so if you get used with Compose / Flutter, 
+# you should be fine.
+
+# Root Container
 <StressMonitorLayout>:
     padding: dp(16)
     spacing: dp(16)
@@ -22,6 +33,9 @@
         Text:
             size_hint_y: 0.05
             text: "Phys-App"
+            valign: "middle"
+            halign: "left"
+
 
         BoxLayout:
             spacing: dp(10)
@@ -47,6 +61,8 @@
                                 text: "Camera Feed"
                                 font_name: app.fonts.body
                                 font_size: app.fonts.size.h3
+                                valign: "middle"
+                                halign: "left"
                                 color: app.colors.black
                         AnchorLayout:
                             anchor_x: 'right'
@@ -100,42 +116,19 @@
                             anchor_x: 'left'
                             anchor_y: 'center'
                             Text:
-                                text: "Heart Rate"
+                                text: "Physiology Signals"
                                 font_name: app.fonts.body
+                                valign: "middle"
+                                halign: "left"
                                 font_size: app.fonts.size.h3
                                 color: app.colors.black
-                        AnchorLayout:
-                            anchor_x: 'right'
-                            anchor_y: 'center'
-                            padding: dp(4)
-                                            
-                            BoxLayout:
-                                size_hint_x: None  
-                                spacing: dp(12)  ## Ensures space between Text and Icon
-                                padding: dp(4)  
-
-                                BoxLayout:
-                                    spacing: dp(4)  
-                                    Text:
-                                        text: "75"
-                                        font_name: app.fonts.body
-                                        font_size: app.fonts.size.h2
-                                        color: app.colors.danger
-                                        width: self.texture_size[0]
-                                    Text:
-                                        text: "BPM"
-                                        font_name: app.fonts.body
-                                        font_size: app.fonts.size.h4
-                                        color: app.colors.black
-                                        width: self.texture_size[0] 
 
                     BoxLayout:
                         size_hint_y: 0.6
-                        OverlayContainer:
-                            padding: dp(10)
-                            radius: [dp(8)] ## Rounded 16dp
-                            MatplotFigure:
-                                id: figure_hr
+                        padding: dp(10)
+                        radius: [dp(8)] ## Rounded 16dp
+                        MatplotFigure:
+                            id: figure_hr
 
 
                     ## Physiology Status StatusIndicator
@@ -169,33 +162,7 @@
                             unit: "BPM"
 
                     BoxLayout:
-                        size_hint_y: 0.15
-                        orientation: 'vertical'
-                        Text:
-                            text:"Stress Indicator"
+                        size_hint_y: 0.1
                         ProgressBarWidget:
+                            id: stress_bar
 
-<CameraLayout>:
-    allow_stretch: True
-    size_hint: 1,1
-    keep_ratio: True
-    canvas.before:
-        StencilPush
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [10]  # Adjust for roundness
-        StencilUse
-
-    canvas:
-        Color:
-            rgba: 1, 1, 1, 1
-        Rectangle:
-            texture: self.texture  # Keeps the camera feed
-            pos: self.pos
-            size: self.size
-
-    canvas.after:
-        StencilUnUse
-        StencilPop
-    

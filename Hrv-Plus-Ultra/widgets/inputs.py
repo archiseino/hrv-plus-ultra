@@ -8,21 +8,12 @@ Builder.load_string("""
 <Text>:
     text_size: self.size
     valign: "middle"
+    halign: "center"
     font_name: app.fonts.subheading
     shorten_from: "right"
     shorten: True
     color: [0,0,0, 1]
                     
-<CustomTextInput>:
-    size_hint: None, None
-    size: 200, 50
-    font_size: '16sp'
-    multiline: False
-    padding: [10, 10]
-    background_normal: ''
-    background_color: 1, 1, 1, 1
-    foreground_color: 0, 0, 0, 1
-
 <LiveDataLabel>:
     size_hint: None, None
     size: 150, 50
@@ -42,8 +33,6 @@ class Text(Label):
     def __init__(self, **keywords):
         super().__init__(**keywords)
 
-class CustomTextInput(TextInput):
-    pass
 
 class LiveDataLabel(BoxLayout):
     def update_data(self, data):

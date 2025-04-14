@@ -18,7 +18,6 @@ def preprocess_ppg(signal, fs = 30):
         numpy array: 
             The Preprocessed PPG Signal
     
-
     """ 
 
     # Additional lowpass tod remove high-frequency noise
