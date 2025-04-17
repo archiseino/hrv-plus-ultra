@@ -55,3 +55,18 @@ In many natural processes, data collection is often unevenly spaced due to real-
 Well, Waiting for 2 minute is a pain. Ah I see I wonder we can talk about the scope later with Mr. Martin
 
 ![image](assets/image.png)
+
+## Well
+
+1. Frequency Resolution Depends on Time Duration
+   The frequency resolution ($\Delta \text{ f}$) in an FFT is inversely proportional to the total time window of your signal:
+
+$$
+\Delta \text{ f} = \frac{1}{T} \text{ Where t in time}
+$$
+
+In fact, it is recommended that
+spectral analyses are performed on recordings at least 10
+times longer than the wavelength of the lower frequency
+limit that is at least 2 min for the Low Frequency power
+(LF).
