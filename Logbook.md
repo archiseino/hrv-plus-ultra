@@ -27,3 +27,9 @@ Missing in Action - User suspect going missing (playing Door Kickers 2 & Project
 
 - Working on pre-procecessing steps
 - Working on GUI Real time RPPG
+
+## Week 7 - ( March 29 - April 15 ) Lebaran Time
+
+## Week 8 - April 20
+
+- Working on Bab 1
