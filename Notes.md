@@ -14,3 +14,13 @@ Update the bsi to earlier one,
 upate the HRV-features methods to work with the neurokit and bandpass filter methods - Upsampling the data to 100 Hz
 
 work with dataset physio itera
+
+### Uptake
+
+Bland-altman is fine, but we can correct it with linear regression and other model to make less bias
+
+This leaves a question, since the short term have much more data since windowing, compare to the full / Y variable, how does one correlate / plot the bland-altman
+
+Approach A: Aggregate Short Windows Per Subject
+
+Make jupyter files on several subject test and see which one is better. each file containing unique test case like file a is for subject T1 and etc.
