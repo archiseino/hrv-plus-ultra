@@ -1,0 +1,267 @@
+#:import FlatButton widgets.buttons.FlatButton
+#:import IconButton widgets.buttons.IconButton
+
+<RoundedFlatButton@FlatButton>:
+    canvas.before:
+        Color:
+            rgba: 0.9, 0.9, 0.9, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(18)]
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(18))
+            width: 1
+
+<DarkFlatButton@FlatButton>:
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.2, 0.2, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(18)]
+
+<CircleFlatButton@FlatButton>:
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        RoundedRectangle:
+            pos: self.pos[0] + dp(12), self.pos[1] + dp(15)
+            size: dp(16), dp(16) 
+            radius: [dp(8)]
+
+<Log>:
+    orientation: 'vertical'
+    padding: dp(16)
+    spacing: dp(16)
+    canvas.before:
+        Color:
+            rgba: 0.98, 0.98, 0.98, 1  # Very light gray background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        
+    # Main content area with title and controls
+    BoxLayout:
+        orientation: 'vertical'
+        
+        # Title and controls
+        BoxLayout:
+            size_hint_y: None
+            spacing: dp(10)
+            padding: dp(20)
+            height: dp(100)
+            orientation: 'horizontal'
+            
+            Label:
+                text: "Physiological Data Log"
+                font_size: '22sp'
+                color: 0.2, 0.2, 0.2, 1
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+                size_hint_x: 0.5
+            
+            Label:
+                id: counter_label
+                text: "Showing 0 of 150 entries"
+                size_hint_x: 0.3
+                color: 0.4, 0.4, 0.4, 1
+                font_size: '14sp'
+                halign: 'right'
+                valign: 'middle'
+                text_size: self.size
+            
+            RoundedFlatButton:
+                text: "Export Data"
+                size_hint_x: None
+                width: dp(120)
+                height: dp(36)
+                pos_hint: {'center_y': 0.5}
+                color: 0.3, 0.3, 0.3, 1
+                font_size: '14sp'
+                            
+        # Table header
+        BoxLayout:
+            size_hint_y: None
+            height: dp(50)
+            padding: [dp(10), dp(15)]  # Reduce horizontal padding to expand table width
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Line:
+                    points: self.x, self.y, self.x + self.width, self.y
+                    width: 1
+                Line:
+                    points: self.x, self.y + self.height, self.x + self.width, self.y + self.height
+                    width: 1
+            
+            BoxLayout:
+                # This inner container ensures the header expands to full width
+                size_hint_x: 1
+                
+                Label:
+                    text: "Date & Time"
+                    bold: True
+                    size_hint_x: 0.25  # Relative sizing instead of fixed width
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                
+                Label:
+                    text: "Heart Rate"
+                    bold: True
+                    size_hint_x: 0.15
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                
+                Label:
+                    text: "Blood Pressure"
+                    bold: True
+                    size_hint_x: 0.2
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                
+                Label:
+                    text: "Skin Conductance"
+                    bold: True
+                    size_hint_x: 0.2
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                
+                Label:
+                    text: "Stress Level"
+                    bold: True
+                    size_hint_x: 0.15
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+                
+        # RecycleView for data rows
+        BoxLayout:
+            padding: [dp(10), 0, dp(10), dp(10)]  # Match padding with the header
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 0.9, 0.9, 0.9, 1
+                Line:
+                    rectangle: self.x + dp(10), self.y + dp(10), self.width - dp(20), self.height - dp(20)
+                    width: 1
+            
+            DataView:
+                id: data_view
+                viewclass: 'DataRow'
+                scroll_type: ['bars', 'content']
+                scroll_wheel_distance: dp(100)
+                bar_width: dp(5)
+                bar_color: 0.7, 0.7, 0.7, 1
+                bar_inactive_color: 0.9, 0.9, 0.9, 0.5
+                
+                RecycleBoxLayout:
+                    default_size: None, dp(50)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+                    spacing: dp(0)
+                    padding: dp(5)
+        
+<DataRow>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: dp(50)
+    spacing: dp(5)
+    padding: [dp(5), 0]  # Reduce padding to match header
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Line:
+            points: self.x, self.y, self.x + self.width, self.y
+            width: 1
+    
+    Label:
+        text: root.datetime
+        size_hint_x: 0.25  # Match header proportions
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: 0.3, 0.3, 0.3, 1
+        font_size: '14sp'
+        padding: [dp(10), 0]
+    
+    Label:
+        text: root.heart_rate
+        size_hint_x: 0.15
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: 0.3, 0.3, 0.3, 1
+        font_size: '14sp'
+        padding: [dp(5), 0]
+    
+    Label:
+        text: root.blood_pressure
+        size_hint_x: 0.2
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: 0.3, 0.3, 0.3, 1
+        font_size: '14sp'
+        padding: [dp(5), 0]
+    
+    Label:
+        text: root.skin_conductance
+        size_hint_x: 0.2
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: 0.3, 0.3, 0.3, 1
+        font_size: '14sp'
+        padding: [dp(5), 0]
+    
+    Label:
+        id: stress_level_label
+        text: root.stress_level
+        size_hint_x: 0.15
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+        color: 1, 1, 1, 1
+        font_size: '14sp'
+        canvas.before:
+            Color:
+                rgba: [0.2, 0.6, 0.2, 1] if root.stress_level == "Low" else ([0.7, 0.7, 0.2, 1] if root.stress_level == "Medium" else [0.7, 0.3, 0.3, 1])
+            RoundedRectangle:
+                pos: self.pos[0] + dp(15), self.pos[1] + dp(15)
+                size: self.width - dp(30), self.height - dp(30)
+                radius: [dp(15)]

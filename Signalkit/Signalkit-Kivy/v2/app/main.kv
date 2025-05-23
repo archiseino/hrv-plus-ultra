@@ -1,0 +1,133 @@
+# Global Index Kv Library for Widget 
+
+#:import ShadowBox widgets.containers.ShadowBox
+#:import Text widgets.inputs.Text
+#:import IconButton widgets.buttons.IconButton
+#:import ProgressBarWidget widgets.utils.ProgressBarWidget
+#:import CameraLayout widgets.camera.CameraLayout
+
+#:import HrBox widgets.phys-box.hr.HrBox
+#:import HrvBox widgets.phys-box.hrv.HrvBox
+#:import SpO2Box widgets.phys-box.spo2.SpO2Box
+#:import RespBox widgets.phys-box.resp.RespBox
+
+#:import RoundedButton widgets.buttons.RoundedButton
+#:import DarkRoundedButton widgets.buttons.DarkRoundedButton
+#:import CircleButton widgets.buttons.CircleButton
+
+#:import Home views.home.Home
+#:import Log views.log.Log
+
+# Don't touch this, proceed with cautions
+# This layout UI is based on the assets/images/UI.jpg
+
+# The kv files is based on Declarative UI paradigm, so if you get used with Compose / Flutter, 
+# you should be fine.
+
+# Root Container
+<StressMonitorLayout>:
+    padding: dp(16)
+    spacing: dp(16)
+    canvas.before:
+        Color:
+            rgba: rgba('#ffffff')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        id: nav_menu
+        size_hint_x: .2
+        orientation: 'vertical'
+        BoxLayout:
+            id: logo_nbox
+            size_hint_y: .15
+            padding: dp(8)
+            Text:
+                text: 'Signalkit'
+                font_name: app.fonts.heading
+                font_size: app.fonts.size.h3
+       
+        GridLayout:
+            id: tabs_box
+            cols: 1
+            spacing: dp(4)
+            size_hint_y: .6
+            canvas.before:
+                Color:
+                    rgba: rgba("#c4c4c4")
+                Rectangle:
+                    pos: self.pos
+                    size: [self.size[0], dp(1)]
+            NavTab:
+                text: "Home"
+                state: "down"
+                icon: 'assets/icons/ic_grid.png'
+                icon_active: 'assets/icons/ic_grid_active.png'
+                screen_name: 'scrn_home'
+            NavTab:
+                text: 'Log'
+                icon: 'assets/icons/ic_trend.png'
+                icon_active: 'assets/icons/ic_trend_active.png'
+                screen_name: 'scrn_log'
+
+    BoxLayout:
+        size_hint_x: .85 
+        spacing: dp(8)
+        orientation: "vertical"
+        padding: [dp(16), dp(8), dp(12), dp(8)]
+        canvas.before:
+            Color:
+                rgba: app.colors.grey_light
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
+        BoxLayout:
+            ScreenManager:
+                id: scrn_manager
+                Screen:
+                    name: "scrn_home"
+                    Home:
+                        id: home
+                Screen:
+                    name: "scrn_log"
+                    Log:
+                        id: log
+
+<NavTab>:
+    background_normal: ''
+    background_down: ''
+    background_color: [0,0,0,0]
+    group: "tabs"
+    size_hint_y: None
+    height: dp(42)
+    spacing: dp(4)
+    canvas.before:
+        Color:
+            rgba: [0,0,0,0] if self.state == 'normal' else rgba("#E1F1FF")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: [0,0,0,0] if self.state == 'normal' else app.colors.primary
+        Rectangle:
+            pos: [self.pos[0]+(self.size[0]-dp(1)), self.pos[1]]
+            size: [dp(8), self.size[1]]
+    AnchorLayout:
+        size_hint_x: None
+        width: self.height
+        padding: [dp(28),dp(14),dp(0),dp(14)]
+        Widget:
+            canvas.before:
+                Color:
+                    rgba: [1,1,1,1]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: root.icon if root.state == 'normal' else root.icon_active
+    Text:
+        halign: 'left'
+        valign: 'middle'
+        text: root.text
+        color: rgba('c4c4c4') if root.state == 'normal' else app.colors.primary
