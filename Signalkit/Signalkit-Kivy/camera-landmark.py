@@ -235,10 +235,11 @@ class CameraLayout(Image):
         
         ret, frame = self.capture.read()
         if ret:
-            frame = cv2.flip(frame, 0)
-            
+
             # First detect the face (this modifies frame by drawing rectangles)
             self.detect_face(frame)
+
+            frame = cv2.flip(frame, 0)            
             
             # Then create the buffer from the modified frame
             buffer = frame.tobytes()

@@ -49,11 +49,19 @@ class CameraLayout(Image):
         ## OpenCv Props
         self.signal_value = 0
         self.fps = 30
-        self.face_landmarker = self.setup_face_landmarker()
+        self.face_detector = self.setup_face_landmarker()
+        # self.pose_landmarker = self.setup_pose_landmarker()
         self.capture = cv2.VideoCapture(0)  
         Clock.schedule_interval(self.update, 1.0 / 30) # Update the Camera feed at 30 FPS
         Clock.schedule_interval(self.emit_rppg_signal, 1.0/ 10) # Emit the signal at 10 Hz
         Clock.schedule_interval(self.send_data_log, 20) # Update the Log every 1 minute
+
+        ## Pose Landmarker Props
+        self.features = None  # Initialize features attribute
+        self.left_x = None
+        self.top_y = None
+        self.right_x = None
+        self.bottom_y = None
 
         ## Set schedule for Phys signal
         Clock.schedule_interval(self.update_heart_rate, 2)      # every 2s
@@ -235,16 +243,18 @@ class CameraLayout(Image):
         
         ret, frame = self.capture.read()
         if ret:
+            frame = cv2.flip(frame, 0)
+            ## Store the buffer before displaying into the Kivy
+            buffer = frame.tobytes()
 
-            # First detect the face (this modifies frame by drawing rectangles)
             self.detect_face(frame)
 
-            frame = cv2.flip(frame, 0)            
-            
-            # Then create the buffer from the modified frame
-            buffer = frame.tobytes()
-            
-            # Create texture from the buffer of the modified frame
+            # self.detect_pose(frame)
+
+            ## Texture.create config:
+            ## size: The size of the texture in pixels (width, height)
+            ## colorfmt: The color format of the texture (one of rgba, rgb, or bgr)
+            ## bufferfmt: The buffer format of the texture (one of ‘ubyte’, ‘ushort’, ‘float’)
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt="bgr")
             texture.blit_buffer(buffer, colorfmt="bgr", bufferfmt="ubyte")
             self.texture = texture
@@ -266,58 +276,76 @@ class CameraLayout(Image):
                 self.process_rppg_signal(temp_r, temp_g, temp_b)
 
     def detect_face(self, frame):
-        # Convert the frame to RGB
+        margin_x = 10  # Adjust horizontally
+        scaling_factor = 0.8
+        
+        ## Detect the face area using shape
+        h, w, _ = frame.shape
+
+        ## Converting into RGB
         image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        left_r_signal, left_g_signal, left_b_signal = [], [], []
-        right_r_signal, right_g_signal, right_b_signal = [], [], []
-
+        ## Seting up the Mediapipe Image
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
             data=image_rgb
         )
 
-        # Get the landkmarks
-        result = self.face_landmarker.detect(mp_image)
+        # ## Get the landmarks
+        result = self.face_detector.detect(mp_image)
 
-        if not result.face_landmarks:
-            print("No face landmarks detected")
+        if result.detections:
+            for detection in result.detections:
 
-        if result.face_landmarks:
-            for face_landmark in result.face_landmarks:
-                # Get cheek ROIs
-                left_cheek_rect, right_cheek_rect = self.get_cheek_rois(face_landmark, frame.shape)
+                ## Get the Bounding box
+                bboxC = detection.bounding_box
+                x, y, w, h = bboxC.origin_x, bboxC.origin_y, bboxC.width, bboxC.height
 
-                # Draw both cheek ROIs with rectangles
-                cv2.rectangle(frame, (left_cheek_rect[0], left_cheek_rect[1]), (left_cheek_rect[2], left_cheek_rect[3]), (0, 255, 0), 2)
-                cv2.rectangle(frame, (right_cheek_rect[0], right_cheek_rect[1]), (right_cheek_rect[2], right_cheek_rect[3]), (0, 255, 0), 2)
+                new_x = int(x + margin_x)
 
-                # Extract the left and right cheek ROIs
-                left_cheek_roi = self.extract_rgb_from_rect(left_cheek_rect, frame)
-                right_cheek_roi = self.extract_rgb_from_rect(right_cheek_rect, frame)
+                new_w = int(w * scaling_factor)
+                new_h = int(h * scaling_factor)
 
-                # Calculate mean pixel values for the RGB channels
-                left_cheek_rgb = cv2.mean(left_cheek_roi)[:3]
-                right_cheek_rgb = cv2.mean(right_cheek_roi)[:3]
+                ## Get the ROI
+                face_roi = image_rgb[y:y+new_h, new_x:new_x+new_w]
 
-                # Append the RGB values to the respective lists
-                left_r_signal.append(left_cheek_rgb[0])
-                left_g_signal.append(left_cheek_rgb[1])
-                left_b_signal.append(left_cheek_rgb[2])
+                ## Draw the bounding box on the frame
+                cv2.rectangle(frame, (int(x), int(y)), (int(x + new_w), int(y + new_h)), (0, 255, 0), 2)
 
-                right_r_signal.append(right_cheek_rgb[0])
-                right_g_signal.append(right_cheek_rgb[1])
-                right_b_signal.append(right_cheek_rgb[2])
-
-                # Combine and average the RGB values from both cheeks
-                combined_r = (left_cheek_rgb[0] + right_cheek_rgb[0]) / 2
-                combined_g = (left_cheek_rgb[1] + right_cheek_rgb[1]) / 2
-                combined_b = (left_cheek_rgb[2] + right_cheek_rgb[2]) / 2
-
+                ## Calculate the Mean
+                mean_rgb = cv2.mean(face_roi)[:3]
+                
                 # Append the combined RGB values to the respective lists
-                self.combined_r_signal.append(combined_r)
-                self.combined_g_signal.append(combined_g)
-                self.combined_b_signal.append(combined_b)
+                self.combined_r_signal.append(mean_rgb[0])
+                self.combined_g_signal.append(mean_rgb[1])
+                self.combined_b_signal.append(mean_rgb[2])
+
+    def detect_pose(self, frame):
+        ## Mediapipe Pose Detection with Optical Flow
+        if self.features is None:
+            # Initialize ROI and feature detection
+            self.initialize_features(frame)
+
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        if len(self.features) > 10:
+            new_features, status, error = cv2.calcOpticalFlowPyrLK(self.old_gray, frame_gray, self.features, None, **self.lk_params)
+            good_old = self.features[status == 1]
+            good_new = new_features[status == 1]
+            mask = np.zeros_like(frame)
+            for i, (new, old) in enumerate(zip(good_new, good_old)):
+                a, b = new.ravel()
+                c, d = old.ravel()
+                mask = cv2.line(mask, (int(a), int(b)), (int(c), int(d)), (0, 255, 0), 2)
+                frame = cv2.circle(frame, (int(a), int(b)), 3, (0, 255, 0), -1)
+            frame = cv2.add(frame, mask)
+            if len(good_new) > 0:
+                avg_y = np.mean(good_new[:, 1])
+                self.resp_buffer.append(avg_y)
+                self.features = good_new.reshape(-1, 1, 2)
+            self.old_gray = frame_gray.copy()
+        else:
+            # Reinitialize features if tracking fails
+            self.initialize_features(frame)
 
 
     def process_rppg_signal(self, r, g, b):
@@ -334,45 +362,124 @@ class CameraLayout(Image):
 
         self.emitting_rppg_buffer.extend(rppg_signal)  ## Emit the rPPG signal
 
-    def setup_face_landmarker(self):
-        ## Create Facelandmarker Object
-        base_options = python.BaseOptions(model_asset_path="models/face_landmarker.task")
+    def setup_pose_landmarker(self):
+        """
+        Metode untuk menginisialisasi fungsi pose detection dari mediapipe untuk proses resp signal
+        """
+        model_path = resource_path("models/pose_landmarker.task")
+        BaseOptions = mp.tasks.BaseOptions
+        PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
         VisionRunningMode = mp.tasks.vision.RunningMode
-        options = vision.FaceLandmarkerOptions(
+
+        options_image = PoseLandmarkerOptions(
+            base_options=BaseOptions(
+                model_asset_path=model_path,
+            ),
+            running_mode=VisionRunningMode.IMAGE,
+            num_poses=1,
+            min_pose_detection_confidence=0.5,
+            min_pose_presence_confidence=0.5,
+            min_tracking_confidence=0.5,
+            output_segmentation_masks=False
+        )
+        
+        return mp.tasks.vision.PoseLandmarker.create_from_options(options_image)
+
+
+    def setup_face_landmarker(self):
+        ## Create faceDetector Object
+        base_model=resource_path("models/blaze_face_short_range.tflite")
+
+        base_options = python.BaseOptions(model_asset_path=base_model)
+        FaceDetectorOptions = mp.tasks.vision.FaceDetectorOptions
+        VisionRunningMode = mp.tasks.vision.RunningMode
+        options = FaceDetectorOptions(
             base_options=base_options,
-            num_faces=1,
             running_mode = VisionRunningMode.IMAGE,
         )
-        landmarker = vision.FaceLandmarker.create_from_options(options)   
-        return landmarker
+        detector = vision.FaceDetector.create_from_options(options)
+        return detector
+
+    def initialize_features(self, frame):
+        """
+        Metode untuk mendapatkan nilai features untuk keperluan optical flow dan membuat object Lucas Kanade sebagai argument dari optical flow itu sendiri.
+        frame: cv2Object = frame sumber dari kamera untuk melakukan deteksi ROI dada dan bahu
+        """
+
+        roi_coords = get_initial_roi(frame, self.pose_landmarker)
+        self.left_x, self.top_y, self.right_x, self.bottom_y = roi_coords
+        old_frame = frame.copy()
+        old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
+        roi_chest = old_gray[self.top_y:self.bottom_y, self.left_x:self.right_x]
+        self.features = cv2.goodFeaturesToTrack(roi_chest, maxCorners=50, qualityLevel=0.2, minDistance=5, blockSize=3)
+        if self.features is None:
+            raise ValueError("No features found to track!")
+        self.features = np.float32(self.features)
+        self.features[:,:,0] += self.left_x
+        self.features[:,:,1] += self.top_y
+        self.old_gray = old_gray
+        self.lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+
+## The length to be around should width to ensure the landmarks are detected and can proceed to optical flow 
+def get_initial_roi(image, landmarker, x_size=100, y_size=30, shift_x=0, shift_y=-30):
+
+    """
+    Mengambil ROI dari webcam untuk mendeteksi sinyal respirasi berdasarkan pergerakan posisi bahu pasien.
+
+    Args:
+        image (np.ndarray): Frame dari webcam
+        pose_landmarker (task): MediaPipe pose detector yang sudah didownload
+        x_size (int): Ukuran ROI pada sumbu x
+        y_size (int): Ukuran ROI pada sumbu y
+        shift_x (int): Pergeseran ROI pada sumbu x (dimana nilai positif akan menggeser ROI ke kanan dan sebaliknya)
+        shift_y (int): Pergeseran ROI pada sumbu y (dimana nilai positif akan menggeser ROI ke bawah dan sebaliknya)
+
+    Returns:
+        tuple: Koordinat ROI (left_x, top_y, right_x, bottom_y)
+    """
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Mengubah warna BGR ke RGB
+    height, width = image.shape[:2] # Mengambil dimensi frame webcam
     
-    def extract_rgb_from_rect(self, rect, image):
-        x_min, y_min, x_max, y_max = rect
-        roi = image[y_min:y_max, x_min:x_max]
-        return roi
-
-    def get_cheek_rois(self, landmarks, image_shape):
-        h, w, _ = image_shape
-        left_cheek_indices = [111, 121, 50, 142]
-        right_cheek_indices = [350, 340, 355, 280]
-
-        left_cheek_points = [(int(landmarks[idx].x * w), int(landmarks[idx].y * h)) for idx in left_cheek_indices]
-        right_cheek_points = [(int(landmarks[idx].x * w), int(landmarks[idx].y * h)) for idx in right_cheek_indices]
-
-        left_cheek_rect = (
-            min([pt[0] for pt in left_cheek_points]), min([pt[1] for pt in left_cheek_points]),
-            max([pt[0] for pt in left_cheek_points]), max([pt[1] for pt in left_cheek_points])
-        )
-        # print("Left Cheek Rect:", left_cheek_rect)
-        right_cheek_rect = (
-            min([pt[0] for pt in right_cheek_points]), min([pt[1] for pt in right_cheek_points]),
-            max([pt[0] for pt in right_cheek_points]), max([pt[1] for pt in right_cheek_points])
-        )
-        # print("Right Cheek Rect:", right_cheek_rect)
-
-        return left_cheek_rect, right_cheek_rect
-
+    # Membuat gambar MediaPipe dari frame webcam
+    mp_image = mp.Image(
+        image_format=mp.ImageFormat.SRGB,
+        data=image_rgb
+    )
+    
+    # Mendeteksi pose dari frame webcam
+    detection_result = landmarker.detect(mp_image)
+    
+    if not detection_result.pose_landmarks:
+        raise ValueError("No pose detected in first frame!")
+    
+    # Mendeteksi tubuh pengguna dari landmark pertama
+    landmarks = detection_result.pose_landmarks[0]
+    
+    # Mengambil landmark bahu kiri dan kanan
+    left_shoulder = landmarks[11]
+    right_shoulder = landmarks[12]
+    
+    # Menghitung posisi tengah dari bahu kiri dan bahu kanan
+    center_x = int((left_shoulder.x + right_shoulder.x) * width / 2)
+    center_y = int((left_shoulder.y + right_shoulder.y) * height / 2)
+    
+    # Mengaplikasikan shift terhadap titik tengah
+    center_x += shift_x
+    center_y += shift_y
+    
+    # Manghitung batasan ROI berdasarkan posisi tengah dan ukuran ROI
+    left_x = max(0, center_x - x_size)
+    right_x = min(width, center_x + x_size)
+    top_y = max(0, center_y - y_size)
+    bottom_y = min(height, center_y + y_size)
+    
+    # Mevalidasi ukuran ROI
+    if (right_x - left_x) <= 0 or (bottom_y - top_y) <= 0:
+        raise ValueError("Invalid ROI dimensions")
         
+    return (left_x, top_y, right_x, bottom_y)
+
+
 """ For building reference path PyInstaller"""
 def resource_path(relative_path):
     try:
