@@ -24,3 +24,7 @@ This leaves a question, since the short term have much more data since windowing
 Approach A: Aggregate Short Windows Per Subject
 
 Make jupyter files on several subject test and see which one is better. each file containing unique test case like file a is for subject T1 and etc.
+
+### Insight
+
+Stress is not a universal state marked by a single HRV cutoff — it’s a relative shift in autonomic balance. For research and applications, this means contextual HRV interpretation (baseline vs. current) is key, especially for real-time stress inference.
