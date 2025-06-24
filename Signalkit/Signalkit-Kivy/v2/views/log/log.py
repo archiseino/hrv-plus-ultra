@@ -57,14 +57,22 @@ class DataView(RecycleView):
     
     def add_data_point(self):
         """Add a single data point with current timestamp"""
+        # new_data = {
+        #     'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
+        #     'heart_rate': f"{random.randint(70, 100)} bpm",
+        #     'blood_pressure': f"{random.randint(110, 140)}/{random.randint(70, 90)} mmHg",
+        #     'skin_conductance': f"{random.uniform(1.0, 5.0):.1f} μS",
+        #     'stress_level': random.choice(["Low", "Medium", "High"]),
+        #     'index': len(self.data)
+        # }
+
         new_data = {
             'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
             'heart_rate': f"{random.randint(70, 100)} bpm",
-            'blood_pressure': f"{random.randint(110, 140)}/{random.randint(70, 90)} mmHg",
-            'skin_conductance': f"{random.uniform(1.0, 5.0):.1f} μS",
             'stress_level': random.choice(["Low", "Medium", "High"]),
             'index': len(self.data)
         }
+
         
         # Create new list to trigger property change
         self.data = self.data + [new_data]

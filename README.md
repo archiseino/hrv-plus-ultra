@@ -132,3 +132,9 @@ Dengan asumsi umum bahwa:
 Mungkin segini dulu yang bisa saya pikirkan pada saat ini. Pak Martin ada pendapat lain?
 
 To be fair, karena ternyata rPPG hanya bisa melakukan estimasi Pulse Rate, karena masalah limitasi, apakah ini termasuk penelitian yang parsial gagal atau kita bisa taruh di bagian kesimpulan dan saran, menunjukan bahwa masih ada limitasi dari rppg?
+
+## Note
+
+Running the t-test or statistical test also resulted in no significant result between the rest and stressor task.
+
+But some individual level shows the increase of the HR during task scenario, highlighting the importance of considering inter-individual variability in future stress-detection research
