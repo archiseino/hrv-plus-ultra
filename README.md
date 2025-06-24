@@ -33,7 +33,7 @@ Bagian ini berfokus untuk mencari tahu variasi waktu antar detak jantung, dan bi
 | | pNN50 | % | Mengukur seberapa sering jarak antar detak jantung berubah lebih dari 50ms. Semakin sering terjadi, maka artinya tubuh lebih rileks |
 | | RMSSD | milidetik (ms) | Mengukur seberapa besar perubahan antara setiap detak jantung secara berurutan. Nilai ini juga menunjukan tingkat rileks tubuh, semakin besar nilai intervalnya, maka tubuh cenderung sedang dalam kondisi rileks |
 
-## Frequency Domain: Melihat komponen frekuensi pembentuk sinyal detak jantung
+### Frequency Domain: Melihat komponen frekuensi pembentuk sinyal detak jantung
 
 Selain melihat perubahan waktu antar detak jantung, kita juga bisa melihat isi “frekuensi” di dalam sinyal detak jantung.
 
@@ -110,9 +110,10 @@ Skenario stres akan disimulasikan melalui perekaman subjek saat mengerjakan tuga
 
 Dalam implementasi real-time, digunakan asumsi bahwa 2 menit pertama merepresentasikan kondisi rest, dan 2 menit berikutnya adalah stressor. Perbedaan Pulse Rate dianalisis untuk memutuskan apakah terjadi peningkatan signifikan yang menunjukkan kondisi stres.
 
-$$
+
+```math
 \text{PR}_{stress} = \text{PR}_{Rest} \times (1 + \frac{\Delta \%}{100})
-$$
+```
 
 Dengan asumsi umum bahwa:
 
