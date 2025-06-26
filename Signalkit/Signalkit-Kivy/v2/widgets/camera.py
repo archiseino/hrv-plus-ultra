@@ -10,6 +10,7 @@ from kivy.uix.image import Image
 from kivy.app import App
 from kivy.graphics.texture import Texture
 from kivy.lang import Builder
+from scipy.signal import find_peaks
 import datetime
 
 from utils.POS import POS
@@ -57,10 +58,10 @@ class CameraLayout(Image):
 
         ## Set schedule for Phys signal
         Clock.schedule_interval(self.update_heart_rate, 2)      # every 2s
-        Clock.schedule_interval(self.update_hrv, 30)            # every 30s
-        Clock.schedule_interval(self.update_resp, 15)           # every 15s
-        Clock.schedule_interval(self.update_spo2, 30)           # every 30s
-        Clock.schedule_interval(self.update_bar, 30)          # every 30s
+        # Clock.schedule_interval(self.update_hrv, 30)            # every 30s
+        # Clock.schedule_interval(self.update_resp, 15)           # every 15s
+        # Clock.schedule_interval(self.update_spo2, 30)           # every 30s
+        # Clock.schedule_interval(self.update_bar, 30)          # every 30s
 
         ## Phys signal buffer
         self.combined_r_signal = []
@@ -134,38 +135,33 @@ class CameraLayout(Image):
             return None
 
     def send_data_log(self, dt):
-        ## Getting the Log Widget
         app = App.get_running_app()
         if not app:
             print("No running app found")
             return None
         
-        # Get the screen manager
         try:
-            # Make sure we use the correct ID for the screen manager
-            # screen_manager = app.root.ids.scrn_manager
-            # Access the log widget directly from the root
             if 'log' in app.root.ids:
                 log_widget = app.root.ids.log
                 print(f"Found log widget directly in root.ids: {type(log_widget).__name__}")
                 
-                # If log widget has the data_view
-                if hasattr(log_widget, 'ids') and 'data_view' in log_widget.ids:
-                    data_view = log_widget.ids.data_view
-                    data_view.add_data_point()
-                    print("Data point added successfully to log via direct access")
-                    return True
+                # Calculate the heart rate from the rPPG buffer
+                recent_signal = self.rppg_buffer[-1] if self.rppg_buffer else np.array([])
+                peaks, _ = find_peaks(recent_signal, distance=30/2)
+                peak_intervals = np.diff(peaks) / 30
+                heart_rate = 60.0 / np.mean(peak_intervals) if len(peak_intervals) > 0 else 0
                 
-                # If log widget has the method we need
-                elif hasattr(log_widget, 'add_data_point_to_log'):
-                    log_widget.add_data_point_to_log()
-                    print("Data point added successfully to log via method")
+                # Format the heart rate as a string with units
+                formatted_hr = f"{heart_rate:.1f} bpm"
+                
+                # Call the method directly on the log_widget
+                if hasattr(log_widget, 'add_data_point_to_log_with_data'):
+                    log_widget.add_data_point_to_log_with_data(formatted_hr)
+                    print("Data point added successfully to log")
                     return True
-                    
                 else:
-                    print(f"Log widget found but missing required attributes")
-                    if hasattr(log_widget, 'ids'):
-                        print(f"Available ids in log widget: {list(log_widget.ids.keys())}")
+                    print(f"Log widget found but missing required add_data_point_to_log_with_data method")
+                    print(f"Available methods: {[method for method in dir(log_widget) if not method.startswith('_')]}")
             else:
                 print("Log widget not found in root.ids")
             
@@ -175,7 +171,7 @@ class CameraLayout(Image):
             if app and hasattr(app.root, 'ids'):
                 print(f"Available root ids: {list(app.root.ids.keys())}")
             return None
-
+        
     def update_heart_rate(self, dt):
         if len(self.rppg_buffer) > 0:
             home = self.get_home_widget()

@@ -79,6 +79,38 @@ class DataView(RecycleView):
 
         self.refresh_from_data()
 
+    def add_data_point_to_log_with_data(self, heart_rate):
+        """Add a data point with specific physiological values from the camera feed"""
+        print("add_data_point_to_log_with_data called")
+        data_view = self.get_log_widget()
+        if data_view:
+            new_data = {
+                'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
+                'heart_rate': heart_rate,
+            }
+            
+            # new_data = {
+            #     'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
+            #     'heart_rate': heart_rate,
+            #     'blood_pressure': blood_pressure,
+            #     'skin_conductance': skin_conductance,
+            #     'stress_level': stress_level,
+            #     'index': len(data_view.data)
+            # }
+            
+            # Add to data_view and trigger update
+            data_view.data = data_view.data + [new_data]
+            data_view.refresh_from_data()
+            print(f"Added custom data point. Total entries: {len(data_view.data)}")
+            
+            # Update counter label if it exists
+            if 'counter_label' in self.ids:
+                self.ids.counter_label.text = f"Showing {len(data_view.data)} of {self.total_entries} entries"
+            
+            return True
+        print("Could not get data_view widget")
+        return False
+
 class Log(Screen):
     def __init__(self, **kwargs):
         super(Log, self).__init__(**kwargs)
@@ -105,18 +137,18 @@ class Log(Screen):
             return None
         return self.ids.data_view
 
-    def add_data_point_to_log(self):
-        """Public method to add a data point to the log without accessing ids externally"""
-        print("add_data_point_to_log called")
-        data_view = self.get_log_widget()
-        if data_view:
-            data_view.add_data_point()
-            print(f"Added data point. Total entries: {len(data_view.data)}")
-            return True
-        print("Could not get data_view widget")
-        return False
+    # def add_data_point_to_log(self):
+    #     """Public method to add a data point to the log without accessing ids externally"""
+    #     print("add_data_point_to_log called")
+    #     data_view = self.get_log_widget()
+    #     if data_view:
+    #         data_view.add_data_point()
+    #         print(f"Added data point. Total entries: {len(data_view.data)}")
+    #         return True
+    #     print("Could not get data_view widget")
+    #     return False
             
-    def add_data_point_to_log_with_data(self, heart_rate, blood_pressure, skin_conductance, stress_level):
+    def add_data_point_to_log_with_data(self, heart_rate):
         """Add a data point with specific physiological values from the camera feed"""
         print("add_data_point_to_log_with_data called")
         data_view = self.get_log_widget()
@@ -124,11 +156,16 @@ class Log(Screen):
             new_data = {
                 'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
                 'heart_rate': heart_rate,
-                'blood_pressure': blood_pressure,
-                'skin_conductance': skin_conductance,
-                'stress_level': stress_level,
-                'index': len(data_view.data)
             }
+            
+            # new_data = {
+            #     'datetime': datetime.now().strftime("%Y-%m-%d %H:%M"),
+            #     'heart_rate': heart_rate,
+            #     'blood_pressure': blood_pressure,
+            #     'skin_conductance': skin_conductance,
+            #     'stress_level': stress_level,
+            #     'index': len(data_view.data)
+            # }
             
             # Add to data_view and trigger update
             data_view.data = data_view.data + [new_data]
