@@ -1,4 +1,4 @@
-## Tugas Akhir: Analisis Studi Korelasi rPPG dan PPG terhadap Estimasi Pulse Rate dan HRV untuk Deteksi Stress Non-Kontak Berdasarkan Kamera
+## Tugas Akhir
 
 ### Latar Belakang
 
@@ -28,20 +28,8 @@ HRV bukanlah sebuah nilai, melaikan koleksi dari beberapa metrik yang menunjukan
 Bagian ini berfokus untuk mencari tahu variasi waktu antar detak jantung, dan biasa di kenal dengan konsep NN (_Normal to Normal_) interval
 | **Domain** | **HRV Feature** | **Unit** | **Description** |
 |----------------|------------------|----------|----------------------------------------------------------------------------------|
-| **Time** | MeanNN | milidetik (ms) | Rata-rata jarak waktu antar detak jantung dalam periode tertentu (misalnya 1–2 menit rekaman). |
-| | SDNN | milidetik (ms) | Mengukur seberapa besar variasi jarak antar detak jantung (standar deviasi dari seluruh data). |
-| | pNN50 | % | Mengukur seberapa sering jarak antar detak jantung berubah lebih dari 50ms. Semakin sering terjadi, maka artinya tubuh lebih rileks |
+| **Time** | SDNN | milidetik (ms) | Mengukur seberapa besar variasi jarak antar detak jantung (standar deviasi dari seluruh data). |
 | | RMSSD | milidetik (ms) | Mengukur seberapa besar perubahan antara setiap detak jantung secara berurutan. Nilai ini juga menunjukan tingkat rileks tubuh, semakin besar nilai intervalnya, maka tubuh cenderung sedang dalam kondisi rileks |
-
-### Frequency Domain: Melihat komponen frekuensi pembentuk sinyal detak jantung
-
-Selain melihat perubahan waktu antar detak jantung, kita juga bisa melihat isi “frekuensi” di dalam sinyal detak jantung.
-
-| **Domain**    | **HRV Feature**                     | **Unit** | **Description**                                                                                                                                                   |
-| ------------- | ----------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Frequency** | LF (Low Frequencies 0.04 - 0.15 Hz) | ms²      | Mengukur aktivitas campuran antara stres dan relaksasi (simpatik & parasimpatik), biasanya terlihat saat tubuh tidak terlalu aktif maupun terlalu santai.         |
-|               | HF (High Frequencies 0.15 - 0.4 Hz) | ms²      | Mengukur aktivitas sistem saraf parasimpatik (mode rileks/istirahat). Semakin tinggi, semakin tubuh dalam kondisi tenang.                                         |
-|               | LF/HF                               | -        | Perbandingan antara LF dan HF. Digunakan untuk melihat keseimbangan antara stres dan relaksasi. Nilai tinggi bisa berarti tubuh sedang lebih tertekan atau aktif. |
 
 ### Remote Photoplethysmography (rPPG)
 
@@ -65,26 +53,6 @@ Data sinyal fisiologis akan digunakan untuk mengekstraksi `detak jantung` (pulse
 
 Proses ekstraksi dan analisis sinyal dilakukan menggunakan Python, dengan bantuan library seperti `scipy` dan `neurokit2` untuk perhitungan statistik dan fitur HRV.
 
-### Hasil Analsis Studi Korelasi
-
-Berdasarkan hasil studi korelasi yang ditunjukkan pada tabel berikut, dapat disimpulkan bahwa fitur `Pulse Rate (PR)` memiliki korelasi tertinggi antara sinyal rPPG dan PPG di semua metode ekstraksi:
-
-| Metode | Fitur | Korelasi | p-value |
-| ------ | ----- | -------- | ------- |
-| POS    | PR    | 0.7439   | 0.0010  |
-| LGI    | PR    | 0.7681   | 0.0005  |
-| OMIT   | PR    | 0.7651   | 0.0006  |
-| GREEN  | PR    | 0.7846   | 0.0005  |
-| CHROM  | PR    | 0.7643   | 0.0006  |
-
-Didapatkan bahwasannya hanya rPPG mampu secara kurang lebih akurat untuk memprediksi `Pulse Rate`. Namun, untuk fitur HRV lainnya seperti `LF, HF, SDNN, pNN50, dan LF/HF`, nilai korelasi cenderung lebih rendah dan sering kali tidak signifikan secara statistik (p-value > 0.05). Ini menunjukkan bahwa akurasi estimasi fitur HRV dari sinyal rPPG belum cukup stabil atau dapat diandalkan.
-
-Hal ini menunjukan bahwa:
-
-- rPPG dapat digunakan secara cukup akurat untuk mengestimasi Pulse Rate, terutama dalam kondisi pencahayaan dan posisi wajah yang stabil.
-- Namun, untuk estimasi fitur HRV yang lebih kompleks, dibutuhkan sinyal yang lebih bersih dan stabil seperti dari PPG langsung atau sinyal ECG, karena fitur HRV sangat sensitif terhadap noise dan artefak gerakan.
-- Keterbatasan teknis seperti motion artifact, noise dari pencahayaan, serta ketidakstabilan ROI wajah menjadi tantangan utama dalam penggunaan rPPG untuk analisis HRV tingkat lanjut.
-
 ### Pengembangan Sistem
 
 Berdasarkan hasil studi korelasi sebelumnya, disimpulkan bahwa metode remote photoplethysmography (rPPG) cukup andal untuk estimasi Pulse Rate (PR), tetapi belum akurat untuk fitur HRV yang lebih kompleks karena keterbatasan teknis seperti noise dan artefak gerakan.
@@ -92,50 +60,3 @@ Berdasarkan hasil studi korelasi sebelumnya, disimpulkan bahwa metode remote pho
 Namun, sistem prediksi stres masih dapat dikembangkan berdasarkan perubahan Pulse Rate antar kondisi, dengan membandingkan `PR` antara kondisi istirahat `(rest)` dan kondisi `stres` (dalam hal ini, tugas aritmatika mental sebagai stressor).
 
 Untuk metode rPPG sendiri, karena hanya Pulse Rate yang memiliki korelasi yang paling bagus dengan GT, metode `POS` akan dipakai dalam aplikasi real-time, tidak ada alasan spesifik, karena semua metode kurang lebih mirip
-
-#### Penentuan Threshold
-
-Untuk menentukan ambang batas (threshold) perubahan PR yang mengindikasikan stres, akan dilakukan dua pendekatan:
-
-- Analisis Dataset UBFC-Phys
-  Menganalisis selisih PR antara segmen kondisi rest dan stress (tugas aritmatika) yang tersedia di dataset.
-
-- Eksperimen Langsung pada Subjek Baru
-  Mengambil data dari subjek nyata dengan skenario serupa (rest dan mental stress task), menggunakan rPPG, untuk menghitung dan memvalidasi threshold.
-
-Skenario stres akan disimulasikan melalui perekaman subjek saat mengerjakan tugas aritmatika di situs:
-🔗 [react-mental-task-app.vercel.app](https://react-mental-task-app.vercel.app/)
-
-#### Prediksi Real-Time
-
-Dalam implementasi real-time, digunakan asumsi bahwa 2 menit pertama merepresentasikan kondisi rest, dan 2 menit berikutnya adalah stressor. Perbedaan Pulse Rate dianalisis untuk memutuskan apakah terjadi peningkatan signifikan yang menunjukkan kondisi stres.
-
-
-```math
-\text{PR}_{stress} = \text{PR}_{Rest} \times (1 + \frac{\Delta \%}{100})
-```
-
-Dengan asumsi umum bahwa:
-
-- Delta merupakan percentasi perbedaan Pulse Rate ketika dalam kondisi rest (santai) dengan stres, Berdasarkan data dari hasil dataset `UBFC-Phys` dan melakukan perekaman pada beberapa subject
-- PR akan meningkat saat stres
-- PR pada kondisi istirahat relatif stabil dan lebih rendah
-
-### Rencana Tugas
-
-- Mencari subjek dan merekam subjek dalam kondisi rest / stress
-- Menghitung threshold untuk kondisi rest / stress state
-- Implementasi formula dalam KivyApp
-- Mencari referensi penelitian terkait sebagai pendukung
-
-### Kesimpulan
-
-Mungkin segini dulu yang bisa saya pikirkan pada saat ini. Pak Martin ada pendapat lain?
-
-To be fair, karena ternyata rPPG hanya bisa melakukan estimasi Pulse Rate, karena masalah limitasi, apakah ini termasuk penelitian yang parsial gagal atau kita bisa taruh di bagian kesimpulan dan saran, menunjukan bahwa masih ada limitasi dari rppg?
-
-## Note
-
-Running the t-test or statistical test also resulted in no significant result between the rest and stressor task.
-
-But some individual level shows the increase of the HR during task scenario, highlighting the importance of considering inter-individual variability in future stress-detection research

@@ -3,8 +3,6 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.behaviors import ButtonBehavior
 import kivy.properties as props
-from scipy.signal import find_peaks
-import numpy as np
 
 kv = """
 <HrvBox>:
@@ -75,17 +73,21 @@ class HrvBox(ButtonBehavior, BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     
-    def update_value(self, rppg_value, fps=30):
-        peaks, _ = find_peaks(rppg_value, prominence=0.5)
+    def update_value(self, hrv_value):
+        """Update the HRV display with a calculated HRV value from camera"""
+        if hrv_value is None:
+            self.value = "No Signal"
+            self.status = "No Data"
+            return
+            
+        # hrv_value is already calculated in camera.py (RMSSD in ms)
+        hrv = float(hrv_value)
+        self.value = f"{hrv:.1f}"
 
-        rr = np.diff(peaks) / fps
-        rr = np.asarray(rr, dtype=float)
-        rr_intervals = rr[( rr >= 0.3 ) & (rr <= 2.0)] # Clean RR interval outside 0.3 - 2.0 seconds
-
-        rr_intervals = rr_intervals * 1000 # Turn into ms
-
-        hrv_sdnn = np.std(rr_intervals)
-
-        hrv_status = "Stable" if hrv_sdnn < 30 else "Unstable"
-        self.value = f"{hrv_sdnn:.2f}"
-        self.status = hrv_status
+        # Update status based on HRV ranges (RMSSD values)
+        if hrv < 20:
+            self.status = "Low Variability"
+        elif hrv > 50:
+            self.status = "High Variability"
+        else:
+            self.status = "Normal"

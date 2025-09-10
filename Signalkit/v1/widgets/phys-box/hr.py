@@ -3,8 +3,6 @@ from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.behaviors import ButtonBehavior
 import kivy.properties as props
-from scipy.signal import find_peaks
-import numpy as np
 
 kv = """
 <HrBox>:
@@ -72,17 +70,18 @@ class HrBox(ButtonBehavior, BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     
-    def update_value(self, rppg_value, fs = 30):
-        peaks, _ = find_peaks(rppg_value, prominence=0.5)
-        rr = np.diff(peaks) / fs # Convert to seconds
+    def update_value(self, heart_rate_value):
+        """Update the HR display with a calculated heart rate value from camera"""
+        if heart_rate_value is None:
+            self.value = "No Signal"
+            self.status = "No Data"
+            return
+            
+        # heart_rate_value is already calculated in camera.py
+        heart_rate = int(heart_rate_value)
+        self.value = f"{heart_rate}"
 
-        rr = np.asarray(rr, dtype=float)
-        rr_intervals = rr[( rr >= 0.3 ) & (rr <= 2.0)] # Clean RR interval outside 0.3 - 2.0 seconds
-
-        heart_rate = int(60.0 / np.mean(rr_intervals)) 
-
-        self.value = f"{heart_rate:.2f}"
-
+        # Update status based on heart rate ranges
         if heart_rate < 60:
             self.status = "Low Heart Rate"
         elif heart_rate > 100:

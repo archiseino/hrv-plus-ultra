@@ -1,7 +1,6 @@
 #:import ShadowBox widgets.containers.ShadowBox
 #:import Text widgets.inputs.Text
 #:import IconButton widgets.buttons.IconButton
-#:import ProgressBarWidget widgets.utils.ProgressBarWidget
 #:import CameraLayout widgets.camera.CameraLayout
 
 #:import HrBox widgets.phys-box.hr.HrBox
@@ -64,36 +63,38 @@
                             id: camera_layout
 
                     BoxLayout:
-                        size_hint_y: 0.1
-                        orientation: 'horizontal'
-                        AnchorLayout:
-                            anchor_x: 'center'
-                            anchor_y: 'center'
-                            Button:
-                                text: 'Pause' if camera_layout.camera_active else 'Resume'
-                                on_release: camera_layout.toggle_camera()
-                                size_hint: None, None
-                                size: dp(80), dp(32)
-
-                    BoxLayout:
                         size_hint_y: .1
+                        height: dp(32)
                         orientation: 'horizontal'
-                        AnchorLayout:
-                            anchor_x: 'left'
-                            anchor_y: 'center'
-                            Text:
-                                text: "Status Camera: On" if camera_layout.camera_active else "Status Camera: Paused"
-                                font_name: app.fonts.body
-                                font_size: app.fonts.size.h5
-                                color: app.colors.primary if camera_layout.camera_active else app.colors.grey_light
-                        AnchorLayout:
-                            anchor_x: 'right'
-                            anchor_y: 'center'
+                        padding: [dp(16), 0]  # Optional: horizontal padding
+                        spacing: dp(8)
+                        # Status Text
+                        Text:
+                            text: "Status Camera: On" if camera_layout.camera_active else "Status Camera: Paused"
+                            font_name: app.fonts.body
+                            font_size: app.fonts.size.h5
+                            color: app.colors.primary if camera_layout.camera_active else app.colors.danger
+                            valign: "middle"
+                            halign: "left"
+                            size_hint_x: 1
+                        # Icon Buttons
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_x: None
+                            height: dp(16)
+                            width: dp(40)  # Adjust width as needed
+                            spacing: dp(8)
                             IconButton:
                                 size_hint: None, None
                                 size: dp(16), dp(16)
-                                source: app.resource_path('assets/icons/circle-solid.png')
-                    
+                                pos_hint: {"center_y": 0.5}
+                                on_release: camera_layout.toggle_camera()
+                                source: app.resource_path('assets/icons/pause.png') if camera_layout.camera_active else app.resource_path('assets/icons/play-button.png') 
+                            IconButton:
+                                size_hint: None, None
+                                size: dp(16), dp(16)
+                                pos_hint: {"center_y": 0.5}
+                                source: app.resource_path('assets/icons/circle-solid.png') if camera_layout.camera_active else app.resource_path('assets/icons/circle-red.png')
                     
             ## Physiology Section
             AnchorLayout:
@@ -129,6 +130,10 @@
                         MatplotFigure:
                             id: figure_rppg
 
+                    Widget:
+                        size_hint_y: None
+                        height: dp(12)
+
 
                     ## Physiology Status StatusIndicator
                     BoxLayout:
@@ -140,19 +145,15 @@
                             label: "Heart Rate"
                             unit: "BPM"
                         
-                        SpO2Box:
-                            id: spo2_box
-                            label: "SpO2 Rate"
-                            unit: "%"
-
-
-                    BoxLayout:
-                        size_hint: 1, 0.4
-                        padding: dp(8)
-                        spacing: dp(8)
                         HrvBox:
                             id: hrv_box
                             label: "Hrv Rate"
                             unit: "ms"
+
+
+                    # BoxLayout:
+                    #    size_hint: 1, 0.4
+                    #    padding: dp(8)
+                    #    spacing: dp(8)
 
                      
