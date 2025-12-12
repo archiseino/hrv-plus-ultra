@@ -12,3 +12,12 @@ MMPD_Simulation/extracted_frames
 Physio-Itera/
 MMPD-Subject1/
 Hrv-Export/
+Signalkit-Export/build/
+Signalkit-Export/dist/
+Signalkit-Export/*.spec
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

@@ -94,6 +94,16 @@
                     text_size: self.size
                     halign: 'left'
                     valign: 'middle'
+
+                Label:
+                    text: "HRV (SDNN ms)"
+                    bold: True
+                    size_hint_x: 0.4
+                    color: 0.3, 0.3, 0.3, 1
+                    font_size: '14sp'
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
                                           
         # RecycleView for data rows
         BoxLayout:
@@ -167,7 +177,7 @@
         padding: [dp(5), 0]
     
     Label:
-        text: root.hrv
+        text: root.sdnn
         size_hint_x: 0.4
         text_size: self.size
         halign: 'left'
@@ -175,4 +185,15 @@
         color: 0.3, 0.3, 0.3, 1
         font_size: '14sp'
         padding: [dp(5), 0]
+
+    Label:
+        text: root.rmssd
+        size_hint_x: 0.4
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: 0.3, 0.3, 0.3, 1
+        font_size: '14sp'
+        padding: [dp(5), 0]
+
         

@@ -5,8 +5,6 @@
 
 #:import HrBox widgets.phys-box.hr.HrBox
 #:import HrvBox widgets.phys-box.hrv.HrvBox
-#:import SpO2Box widgets.phys-box.spo2.SpO2Box
-#:import RespBox widgets.phys-box.resp.RespBox
 
 ## Container for Camera and Graph
 
@@ -144,10 +142,24 @@
                             id: hr_box
                             label: "Heart Rate"
                             unit: "BPM"
+
+                        # HrvBox:
+                        #   id: hrv_box
+                        #   label: "Hrv Rate"
+                        #   unit: "ms"
+
+                    BoxLayout:
+                        size_hint: 1, 0.4
+                        padding: dp(8)
+                        spacing: dp(8)
+                        HrvBox:
+                            id: sdnn_box
+                            label: "SDNN"
+                            unit: "ms"
                         
                         HrvBox:
-                            id: hrv_box
-                            label: "Hrv Rate"
+                            id: rmssd_box
+                            label: "RMSSD"
                             unit: "ms"
 
 
