@@ -1,20 +1,12 @@
-## Tugas Akhir
+## Tugas Akhir - Evaluasi Metode rPPG untuk mengukur HR dan HRV dari video wajah.
 
 ### Latar Belakang
 
-Stress merupakan salah satu indikator krusial dalam kehidupan modern manusia. Umumnya, asesmen stres dilakukan secara subjektif melalui kuesioner atau wawancara, yang bisa dipengaruhi oleh persepsi individu. Karena stres bersifat relatif dan tidak selalu disadari oleh individu, pendekatan ini menjadi kurang andal dalam beberapa situasi.
-
-Namun bagaimana jika menggunakan sinyal fisiologi tubuh sebagai indikator kondisi seseorang? Salah satu contohnya adalah penggunaan Sinyal Denyut Nadi (_Pulse Rate_) dan Variabilitas Antar Detak Jantung (_Heart Rate Variability_).
+Remote photoplethysmography hadir menjawab tantangan akan butuhnya pengukuran detak jantung dan metrik tubuh lainnya secara non-kontak. Namun ini menjadi tantangan limitasi apa saja yang terdapat pada teknologi rPPG ini sendiri.
 
 ### Landasan Teori
 
-HRV sendiri menjelaskan tentang seberapa banyak, jarak antar detak jantung berubah-ubah.
-
-Maksud dari pernyataaan ini adalah, ketika kamu memiliki kondisi detak jantung 60 detak per menit (60 BPM). Jarak antara satu detak jantung ke detak jantung yang lain tidak selalu sama persis (misalnya dari detak 1 ke detak 2 sekitar 0.9 detik, dan dari detak 2 ke detak 3 sekitar 0.8 detik).
-
-Konsep perubahan ini disebut dengan HRV.
-
-Konsep HRV sendiri berkaitan tentang kondisi detak jantung dan dan sistem saraf tubuh.
+HRV sendiri menjelaskan tentang variasi kecil pada jeda antar denyut jantung. Jantung yang sehat cenderung memiliki variasi kecil antar denyutnya (sebagai bagian dari adaptasi tubuh). Konsep HRV sendiri berkaitan tentang kondisi detak jantung dan dan sistem saraf tubuh.
 
 - Ketika tubuh sedang dalam kondisi beristirahat / santai, tubuh akan menjalankan mode sistem saraf parasimpatik, menurunkan detak jantung dan meningkatkan jarak antar detak jantung untuk tubuh dapat beristirahat
 - Ketika tubuh sedang dalam tekanan / melakukan tugas kognitif mental, tubuh akan menjalankan mode sistem saraf simpatik, meningkatkan detak jantung, dan menuruntkan jarak antar detak jantung agar tubuh dapat bersiap untuk menghadapi tantangan.
@@ -58,5 +50,3 @@ Proses ekstraksi dan analisis sinyal dilakukan menggunakan Python, dengan bantua
 Berdasarkan hasil studi korelasi sebelumnya, disimpulkan bahwa metode remote photoplethysmography (rPPG) cukup andal untuk estimasi Pulse Rate (PR), tetapi belum akurat untuk fitur HRV yang lebih kompleks karena keterbatasan teknis seperti noise dan artefak gerakan.
 
 Namun, sistem prediksi stres masih dapat dikembangkan berdasarkan perubahan Pulse Rate antar kondisi, dengan membandingkan `PR` antara kondisi istirahat `(rest)` dan kondisi `stres` (dalam hal ini, tugas aritmatika mental sebagai stressor).
-
-Untuk metode rPPG sendiri, karena hanya Pulse Rate yang memiliki korelasi yang paling bagus dengan GT, metode `POS` akan dipakai dalam aplikasi real-time, tidak ada alasan spesifik, karena semua metode kurang lebih mirip

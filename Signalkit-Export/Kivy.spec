@@ -25,6 +25,12 @@ a = Analysis(
         "scipy._lib.array_api_compat.numpy.fft",
         "kivy_matplotlib_widget.uix",
         "kivy_matplotlib_widget.uix.graph_widget",
+        "mediapipe",
+        "widgets.camera",
+        "widgets.buttons",
+        "widgets.inputs",
+        "widgets.phys-box.hr"
+        "widgets.phys-box.hrv"
     ],
     hookspath=[],
     hooksconfig={},
