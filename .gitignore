@@ -14,7 +14,6 @@ MMPD-Subject1/
 Hrv-Export/
 Signalkit-Export/build/
 Signalkit-Export/dist/
-Signalkit-Export/*.spec
 
 # Python cache files
 __pycache__/
