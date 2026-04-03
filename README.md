@@ -1,52 +1,183 @@
-## Tugas Akhir - Evaluasi Metode rPPG untuk mengukur HR dan HRV dari video wajah.
+# Evaluating Remote Photoplethysmography Methods on Calculating the Heart Rate and Heart Rate Variability
 
-### Latar Belakang
+Language: English | [Bahasa Indonesia](README.id.md)
 
-Remote photoplethysmography hadir menjawab tantangan akan butuhnya pengukuran detak jantung dan metrik tubuh lainnya secara non-kontak. Namun ini menjadi tantangan limitasi apa saja yang terdapat pada teknologi rPPG ini sendiri.
+This repository documents an undergraduate thesis project that evaluates remote photoplethysmography (rPPG) methods against reference PPG signals from UBFC-Phys.
 
-### Landasan Teori
+## Project Overview
 
-HRV sendiri menjelaskan tentang variasi kecil pada jeda antar denyut jantung. Jantung yang sehat cenderung memiliki variasi kecil antar denyutnya (sebagai bagian dari adaptasi tubuh). Konsep HRV sendiri berkaitan tentang kondisi detak jantung dan dan sistem saraf tubuh.
+The study evaluates the quality of several rPPG methods for estimating:
 
-- Ketika tubuh sedang dalam kondisi beristirahat / santai, tubuh akan menjalankan mode sistem saraf parasimpatik, menurunkan detak jantung dan meningkatkan jarak antar detak jantung untuk tubuh dapat beristirahat
-- Ketika tubuh sedang dalam tekanan / melakukan tugas kognitif mental, tubuh akan menjalankan mode sistem saraf simpatik, meningkatkan detak jantung, dan menuruntkan jarak antar detak jantung agar tubuh dapat bersiap untuk menghadapi tantangan.
+- Heart Rate (HR)
+- Heart Rate Variability (HRV) features (SDNN, RMSSD)
 
-### Metrik HRV
+Using UBFC-Phys (subjects s41-s56), this study compares multiple rPPG methods and face ROI strategies against contact PPG as the reference signal. The results show that under stationary conditions (T1), several rPPG methods can produce pulse waveforms and HR estimates that track the reference reasonably well, enabling useful HR and selected HRV feature estimation (SDNN, RMSSD). In more active conditions (T2: active, T3: arithmetic), motion from the hand and face introduces stronger artifacts, which degrades waveform quality and reduces agreement with the reference.
 
-HRV bukanlah sebuah nilai, melaikan koleksi dari beberapa metrik yang menunjukan perubahan waktu detak jantung, berikut beberapa metriknya
+The analysis also indicates that ROI choice matters: combining multiple ROI can improve robustness in some cases, but a single well-localized ROI may outperform fragmented ROI combinations depending on scenario and method. Across trials, there is a modest increase in HR during task scenarios, but interpretation should be cautious because part of the change can be explained by motion contamination. Because the dataset does not provide detailed quality annotations for the reference, this work recommends using stronger acquisition modalities (for example ECG) in future studies and adding signal-quality annotations to public datasets to improve evaluation reliability.
 
-### Time Domain: Melakukan analisis perubahan waktu antara detak jantung
+## Current Folder Structure
 
-Bagian ini berfokus untuk mencari tahu variasi waktu antar detak jantung, dan biasa di kenal dengan konsep NN (_Normal to Normal_) interval
-| **Domain** | **HRV Feature** | **Unit** | **Description** |
-|----------------|------------------|----------|----------------------------------------------------------------------------------|
-| **Time** | SDNN | milidetik (ms) | Mengukur seberapa besar variasi jarak antar detak jantung (standar deviasi dari seluruh data). |
-| | RMSSD | milidetik (ms) | Mengukur seberapa besar perubahan antara setiap detak jantung secara berurutan. Nilai ini juga menunjukan tingkat rileks tubuh, semakin besar nilai intervalnya, maka tubuh cenderung sedang dalam kondisi rileks |
+Main folders and files in this workspace:
 
-### Remote Photoplethysmography (rPPG)
+- `artifacts/`: generated outputs from the processing pipeline
+- `dataset_numpy/`: dataset folder (subjects, source files, and method resources)
+- `log-bimbingan/`: supervision/progress notes
+- `mediapipe_models/`: model files for Face Detector and Face Landmarker
+- `pipeline.py`: reproducible processing pipeline (preprocess, metrics, evaluate)
+- `rppg-extraction/`: scripts to extract raw rPPG from videos (`face_detector.py`, `face_landmarker.py`)
+- `rppg_methods/`: method implementations (CHROM, GREEN, LGI, OMIT, POS)
+- `Signalkit/`: proof-of-concept app scripts
+- `Signalkit-Export/`: build/export assets and environment files
+- `utils/`: analysis notebooks and table outputs
 
-Seiring berkembangnya teknologi kamera dan pemrosesan citra (image processing), kini muncul peluang untuk memperoleh sinyal fisiologis tubuh secara non-kontak, salah satunya melalui _remote photoplethysmography_ (rPPG). Berbeda dengan sensor PPG konvensional yang ditempel langsung ke kulit, rPPG dapat menangkap informasi denyut nadi hanya dari perubahan warna halus pada wajah menggunakan kamera.
+## Environment Setup
 
-Namun, agar rPPG dapat digunakan secara luas, diperlukan validasi ilmiah untuk memastikan keakuratannya. Salah satu pendekatan yang umum dilakukan adalah dengan:
+### 1. Python Version
 
-- Membandingkan sinyal rPPG dan PPG secara langsung, baik dari segi estimasi `pulse rate` (PR).
-- Melakukan `analisis korelasi` atau evaluasi performa antara kedua metode untuk menilai apakah rPPG bisa menjadi alternatif yang andal dan praktis dibandingkan sensor PPG konvensional.
+- Recommended: Python 3.11
+- Minimum: Python 3.10
 
-Penelitian ini bertujuan untuk mengevaluasi sejauh mana rPPG dapat menjadi alternatif dari PPG dalam memperoleh sinyal fisiologis, khususnya untuk memprediksi kondisi tubuh seperti saat dalam keadaan rileks atau stres, tanpa perlu kontak langsung dengan kulit.
+### 2. Install Dependencies
 
-### Subject dan Metode
+Run from this folder (`workflow-research`):
 
-Penelitian ini menggunakan dataset `UBFC-Phys`, yaitu sebuah dataset multimodal yang dirancang untuk studi psikofisiologi. Dataset ini mencakup `rekaman video wajah` serta sinyal fisiologis (seperti PPG) dari partisipan yang menjalani dua skenario berbeda:
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-- Skenario istirahat (rest) — merepresentasikan kondisi rileks.
-- Skenario tugas aritmatika mental — dirancang untuk memicu stres kognitif.
+Optional (PoC app):
 
-Data sinyal fisiologis akan digunakan untuk mengekstraksi `detak jantung` (pulse rate) dan fitur-fitur Heart Rate Variability (HRV).
+```bash
+pip install -r Signalkit/requirements.txt
+pip install -r Signalkit-Export/requirements.txt
+```
 
-Proses ekstraksi dan analisis sinyal dilakukan menggunakan Python, dengan bantuan library seperti `scipy` dan `neurokit2` untuk perhitungan statistik dan fitur HRV.
+### 3. Verify Environment
 
-### Pengembangan Sistem
+```bash
+python --version
+pip --version
+python -c "import numpy, scipy, pandas, matplotlib; print('core libs OK')"
+```
 
-Berdasarkan hasil studi korelasi sebelumnya, disimpulkan bahwa metode remote photoplethysmography (rPPG) cukup andal untuk estimasi Pulse Rate (PR), tetapi belum akurat untuk fitur HRV yang lebih kompleks karena keterbatasan teknis seperti noise dan artefak gerakan.
+## Data Preparation
 
-Namun, sistem prediksi stres masih dapat dikembangkan berdasarkan perubahan Pulse Rate antar kondisi, dengan membandingkan `PR` antara kondisi istirahat `(rest)` dan kondisi `stres` (dalam hal ini, tugas aritmatika mental sebagai stressor).
+1. Download the UBFC-Phys dataset zip files from the official [source](https://ieee-dataport.org/open-access/ubfc-phys-2).
+2. Extract all dataset archives and organize them under `dataset_numpy/`.
+3. Ensure subject folders are available from `dataset_numpy/s41` to `dataset_numpy/s56`.
+
+Expected minimal structure:
+
+- `dataset_numpy/s41/`
+- `dataset_numpy/s42/`
+- ...
+- `dataset_numpy/s56/`
+
+At this stage, the folder should contain the extracted source files (for example `.avi`, `.csv`, and metadata files) before rPPG conversion to `.npy`.
+
+## How to Run
+
+Use this execution order:
+
+### Step 1: Extract Dataset Archives
+
+Make sure all UBFC-Phys zip files are extracted first and placed into `dataset_numpy/` as described in Data Preparation.
+
+### Step 2: Generate rPPG `.npy` Files from Video
+
+Run extraction scripts to transform video-based signals into `.npy` files.
+
+```bash
+cd rppg-extraction
+python face_detector.py
+python face_landmarker.py
+```
+
+### Step 3: Reproducible Pipeline
+
+The pipeline separates data processing from reporting and creates reusable artifacts.
+
+Face Landmarker source:
+
+```bash
+python pipeline.py --root-path dataset_numpy --output-dir artifacts --rppg-source face_landmarker --step all
+```
+
+Face Detector source:
+
+```bash
+python pipeline.py --root-path dataset_numpy --output-dir artifacts --rppg-source face_detector --step all
+```
+
+Generated outputs:
+
+- `artifacts/preprocessed/*.npy`
+- `artifacts/signal_manifest.csv`
+- `artifacts/metrics_long.csv`
+- `artifacts/evaluation_summary.csv`
+
+Run by stage:
+
+```bash
+python pipeline.py --root-path dataset_numpy --output-dir artifacts --rppg-source face_landmarker --step preprocess
+python pipeline.py --output-dir artifacts --rppg-source face_landmarker --step metrics
+python pipeline.py --output-dir artifacts --rppg-source face_landmarker --step evaluate
+```
+
+CLI help:
+
+```bash
+python pipeline.py --help
+```
+
+## Proof-of-Concept App
+
+Primary Signalkit app entry point:
+
+```bash
+python Signalkit/v1/main.py
+```
+
+Executable (EXE) distribution is provided through this repository's GitHub release assets.
+
+## Reproducibility Notes
+
+- Keep processing results in `artifacts/` for consistent reruns.
+- Save an environment snapshot when needed:
+
+```bash
+pip freeze > requirements-lock.txt
+```
+
+- Record parameter changes in `log-bimbingan/`.
+
+## How to Cite
+
+If you use this repository for academic purposes, cite the thesis:
+
+Arsyadana Estu Aziz. (2025). EVALUASI METODE REMOTE PHOTOPLETHYSMOGRAPHY DAN AREA WAJAH UNTUK PENGUKURAN DETAK JANTUNG DAN VARIABILITASNYA DARI VIDEO WAJAH DALAM KONTEKS AKTIVITAS KOGNITIF. Program Studi Teknik Informatika, Institut Teknologi Sumatera.
+
+### BibTeX
+
+```bibtex
+@thesis{azizEstu2025deteksi_hr_hrv,
+  author       = {Arsyadana Estu Aziz},
+  title        = {EVALUASI METODE REMOTE PHOTOPLETHYSMOGRAPHY DAN AREA WAJAH UNTUK PENGUKURAN DETAK JANTUNG DAN VARIABILITASNYA DARI VIDEO WAJAH DALAM KONTEKS AKTIVITAS KOGNITIF},
+  school       = {Institut Teknologi Sumatera},
+  year         = {2025},
+  type         = {Undergraduate Thesis},
+  address      = {Lampung Selatan, Indonesia},
+  note         = {Program Studi Teknik Informatika}
+}
+```
+
+## License
+
+Add license information (for example MIT, Apache-2.0, or institutional license).
+
+## Acknowledgments
+
+- Martin Clinton Manullang, Ph.D.
+- Program Studi Teknik Informatika ITERA
+- R. Meziati Sabour, Y. Benezeth, P. De Oliveira, J. Chappe, F. Yang. UBFC-Phys: A Multimodal Database For Psychophysiological Studies Of Social Stress, IEEE Transactions on Affective Computing, 2021.
